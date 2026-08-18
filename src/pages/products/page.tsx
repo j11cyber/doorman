@@ -12,12 +12,17 @@ export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'All';
   const initialMaterial = searchParams.get('material') || 'All';
+  const initialFinish = searchParams.get('finish') || 'All';
+  const initialSearch = searchParams.get('search') || '';
 
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [selectedMaterial, setSelectedMaterial] = useState<string>(initialMaterial);
+  const [selectedFinish, setSelectedFinish] = useState<string>(initialFinish);
+  const [priceRange, setPriceRange] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'name'>('featured');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [addedId, setAddedId] = useState<string | null>(null);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const { formatPrice } = useCurrency();
   const { addToCart } = useCart();
@@ -25,10 +30,15 @@ export default function Products() {
   useEffect(() => {
     const cat = searchParams.get('category') || 'All';
     const mat = searchParams.get('material') || 'All';
+    const fin = searchParams.get('finish') || 'All';
+    const q = searchParams.get('search') || '';
     setSelectedCategory(cat);
     setSelectedMaterial(mat);
+    setSelectedFinish(fin);
+    if (q) setSearchQuery(q);
   }, [searchParams]);
 
+  // Real categories from mockProducts
   const categories = [
     'All',
     'Pivot Doors',
@@ -39,13 +49,34 @@ export default function Products() {
     'Architectural Hardware',
   ];
 
+  // Real material types
   const materialFilters = [
     { label: 'All Materials', value: 'All' },
-    { label: 'Smoked Oak', value: 'Oak' },
+    { label: 'European Oak', value: 'Oak' },
     { label: 'Liquid Bronze', value: 'Bronze' },
-    { label: 'Fluted & Smoked Glass', value: 'Glass' },
+    { label: 'Fluted / Smoked Glass', value: 'Glass' },
     { label: 'Canaletto Walnut', value: 'Walnut' },
-    { label: 'Basalt & Armor', value: 'Basalt' },
+    { label: 'Basalt & Teak Armor', value: 'Basalt' },
+    { label: 'Aerospace Aluminum', value: 'Aluminum' },
+  ];
+
+  // Real finishes found in mockProducts
+  const finishFilters = [
+    { label: 'All Finishes', value: 'All' },
+    { label: 'Smoked Bog Oak', value: 'Smoked Bog Oak' },
+    { label: 'Oxidized Dark Bronze', value: 'Oxidized Dark Bronze' },
+    { label: 'Ready-to-Paint Primer', value: 'Ready-to-Paint Primer' },
+    { label: 'Brushed Bronze', value: 'Brushed Bronze' },
+    { label: 'Natural Canaletto Walnut', value: 'Natural Canaletto Walnut' },
+    { label: 'Scorched Basalt & Teak', value: 'Scorched Basalt & Teak' },
+    { label: 'Matte Architectural Black', value: 'Matte Architectural Black' },
+  ];
+
+  const priceRanges = [
+    { label: 'All Prices', value: 'All' },
+    { label: 'Under ₦10,000,000', value: 'under-10m' },
+    { label: '₦10,000,000 – ₦20,000,000', value: '10m-20m' },
+    { label: 'Above ₦20,000,000', value: 'above-20m' },
   ];
 
   const handleCategorySelect = (category: string) => {
@@ -68,51 +99,58 @@ export default function Products() {
     setSearchParams(searchParams);
   };
 
+  const handleFinishSelect = (finish: string) => {
+    setSelectedFinish(finish);
+    if (finish === 'All') {
+      searchParams.delete('finish');
+    } else {
+      searchParams.set('finish', finish);
+    }
+    setSearchParams(searchParams);
+  };
+
   const clearAllFilters = () => {
     setSelectedCategory('All');
     setSelectedMaterial('All');
+    setSelectedFinish('All');
+    setPriceRange('All');
     setSearchQuery('');
     setSortBy('featured');
     setSearchParams({});
   };
 
-  const [productsList] = useState<typeof mockProducts>(() => {
-    const stored = localStorage.getItem('amco_products');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        const hasStale = Array.isArray(parsed) && parsed.some((p) => 
-          p.images && p.images.some((img: string) => img.includes('513694203232-719a280e022f'))
-        );
-        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].materialType && !hasStale) {
-          return parsed;
-        }
-      } catch (err) {
-        console.warn('Could not parse cached products:', err);
-      }
-    }
-    return mockProducts;
-  });
-
+  // Filter & Sort real products
   const filteredProducts = useMemo(() => {
-    let result = productsList.filter((product) => {
+    const result = mockProducts.filter((product) => {
       const matchesCategory =
         selectedCategory === 'All' || product.category === selectedCategory;
 
       const matchesMaterial =
         selectedMaterial === 'All' ||
-        (product.materialType && product.materialType.toLowerCase().includes(selectedMaterial.toLowerCase())) ||
-        (product.finishOptions && product.finishOptions.some((f) => f.toLowerCase().includes(selectedMaterial.toLowerCase())));
+        product.materialType.toLowerCase().includes(selectedMaterial.toLowerCase()) ||
+        product.finishOptions.some((f) => f.toLowerCase().includes(selectedMaterial.toLowerCase()));
 
+      const matchesFinish =
+        selectedFinish === 'All' ||
+        product.finishOptions.some((f) => f.toLowerCase().includes(selectedFinish.toLowerCase()));
+
+      const matchesPrice =
+        priceRange === 'All' ||
+        (priceRange === 'under-10m' && product.price < 10000000) ||
+        (priceRange === '10m-20m' && product.price >= 10000000 && product.price <= 20000000) ||
+        (priceRange === 'above-20m' && product.price > 20000000);
+
+      const query = searchQuery.trim().toLowerCase();
       const matchesSearch =
-        searchQuery.trim() === '' ||
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.subCategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (product.materialType && product.materialType.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (product.finishOptions && product.finishOptions.some((f) => f.toLowerCase().includes(searchQuery.toLowerCase())));
+        query === '' ||
+        product.name.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query) ||
+        product.subCategory.toLowerCase().includes(query) ||
+        product.materialType.toLowerCase().includes(query) ||
+        product.finishOptions.some((f) => f.toLowerCase().includes(query));
 
-      return matchesCategory && matchesMaterial && matchesSearch;
+      return matchesCategory && matchesMaterial && matchesFinish && matchesPrice && matchesSearch;
     });
 
     // Sorting
@@ -133,7 +171,7 @@ export default function Products() {
     }
 
     return result;
-  }, [productsList, selectedCategory, selectedMaterial, searchQuery, sortBy]);
+  }, [selectedCategory, selectedMaterial, selectedFinish, priceRange, searchQuery, sortBy]);
 
   const handleQuickAdd = (e: React.MouseEvent, product: typeof mockProducts[0]) => {
     e.preventDefault();
@@ -143,113 +181,215 @@ export default function Products() {
     setTimeout(() => setAddedId(null), 2500);
   };
 
-  const categoryNarratives: Record<string, { headline: string; description: string }> = {
-    All: {
-      headline: 'Architectural Doors & Systems Catalogue',
-      description: 'Explore the complete TheDoorman portfolio — precision-engineered pivot entrances, frameless concealed flush systems, acoustic sliding glass partitions, and fortified ballistic portals.',
-    },
-    'Pivot Doors': {
-      headline: 'Monumental Pivot Openings',
-      description: 'Floor-to-ceiling pivot systems engineered with concealed heavy-duty hydraulic bearings supporting up to 500kg of bespoke timber, carbon steel, and patinated liquid bronze.',
-    },
-    'Concealed & Flush Doors': {
-      headline: 'Zero-Sightline Invisible Doors',
-      description: 'Flush-to-wall architectural doors engineered to merge seamlessly into continuous wall planes with 3D micro-adjustable hidden hinges and magnetic latches.',
-    },
-    'Sliding Glass Partitions': {
-      headline: 'Acoustic Glass Sliding Systems',
-      description: 'Minimalist ceiling-hung architectural glass partitions featuring vertical reeded fluted glass, smoked acoustic interlayers, and ultra-slim bronze profiles.',
-    },
-    'Armored Security Doors': {
-      headline: 'Certified Biometric Armored Portals',
-      description: 'Uncompromising European RC4 ballistic security engineering concealed beneath bespoke basalt stone, real bronze, and thermo-treated teak facades.',
-    },
-    'Bespoke Wood Doors': {
-      headline: 'Handcrafted Solid & Fluted Wood Openings',
-      description: 'Selected Canaletto walnut, smoked European oak, and 3D textured staves hand-assembled by master joiners for grand double openings.',
-    },
-    'Architectural Hardware': {
-      headline: 'Sculptural Handles & Hardware',
-      description: 'Solid cast silicon bronze bar pulls, biometric smart grips, and flush magnetic latches designed to complement oversized openings.',
-    },
-  };
-
-  const currentNarrative = categoryNarratives[selectedCategory] || categoryNarratives['All'];
+  const hasActiveFilters =
+    selectedCategory !== 'All' ||
+    selectedMaterial !== 'All' ||
+    selectedFinish !== 'All' ||
+    priceRange !== 'All' ||
+    searchQuery.trim() !== '';
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F1] selection:bg-[#C5A880]/30 selection:text-white">
       <Navbar />
 
-      {/* Catalogue Header */}
-      <div className="pt-32 sm:pt-40 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto border-b border-[#1C1C1C]">
-        <Reveal delay={50} className="space-y-3 max-w-3xl">
-          <div className="flex items-center space-x-2 text-xs font-mono text-[#C5A880] uppercase tracking-widest-arch">
-            <Link to="/" className="hover:underline">Home</Link>
-            <span>/</span>
-            <span>Digital Showroom Catalogue</span>
-          </div>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-light text-[#F3F3F1] leading-tight">
-            {currentNarrative.headline}
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-400 font-light leading-relaxed">
-            {currentNarrative.description}
+      {/* Header Banner */}
+      <div className="pt-32 sm:pt-40 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto border-b border-[#1C1C1C]">
+        <div className="space-y-4 max-w-3xl">
+          <p className="text-xs font-mono uppercase tracking-widest-arch text-[#C5A880]">
+            Digital Showroom & Commercial Store
           </p>
-        </Reveal>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light text-white tracking-tight">
+            SHOP DOORS
+          </h1>
+          <p className="text-sm sm:text-base text-gray-300 font-light leading-relaxed">
+            Explore TheDoorman's collection of architectural door systems. Browse specifications, configure bespoke finishes, and add directly to your order.
+          </p>
+        </div>
 
-        {/* Filter Controls Bar */}
-        <div className="mt-8 space-y-4">
-          {/* Category Tabs */}
-          <div className="flex overflow-x-auto no-scrollbar pb-1 gap-2 sm:gap-2.5 max-w-full flex-nowrap lg:flex-wrap">
-            {categories.map((cat) => {
-              const isSelected = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => handleCategorySelect(cat)}
-                  className={`text-[11px] sm:text-xs uppercase font-mono tracking-wider px-3 sm:px-4 py-2 transition-all duration-200 border flex-shrink-0 whitespace-nowrap active:scale-95 ${
-                    isSelected
-                      ? 'bg-[#C5A880] text-[#0A0A0A] border-[#C5A880] font-semibold shadow-lg'
-                      : 'bg-[#121212] text-gray-300 border-[#262626] hover:border-[#C5A880]/50 hover:text-white'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
+        {/* Live Search Field */}
+        <div className="mt-8 relative max-w-2xl">
+          <i className="ri-search-line absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search doors, finishes, systems (e.g. Pivot, Oak, Bronze)..."
+            className="w-full bg-[#121212] border border-[#262626] focus:border-[#C5A880] py-3.5 pl-12 pr-10 text-sm text-white placeholder-gray-500 font-sans focus:outline-none transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+            >
+              <i className="ri-close-line"></i>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Main Commerce Layout: Filters (Left 3 Cols) + Product Grid (Right 9 Cols) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-12">
+        {/* Mobile Filter Toggle & Sort Header */}
+        <div className="lg:hidden flex items-center justify-between pb-6 mb-6 border-b border-[#1C1C1C] gap-4">
+          <button
+            onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
+            className="flex items-center space-x-2 px-4 py-2 bg-[#141414] border border-[#2A2A2A] text-xs font-mono uppercase tracking-wider text-white"
+          >
+            <i className="ri-filter-3-line text-sm text-[#C5A880]"></i>
+            <span>Filters {hasActiveFilters && '(Active)'}</span>
+          </button>
+
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-mono text-gray-400">Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              aria-label="Sort products by"
+              className="bg-[#141414] border border-[#2A2A2A] text-xs font-mono py-2 px-3 text-white focus:outline-none focus:border-[#C5A880]"
+            >
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low → High</option>
+              <option value="price-desc">Price: High → Low</option>
+              <option value="name">Name: A–Z</option>
+            </select>
           </div>
+        </div>
 
-          {/* Secondary Filter & Search Row */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-3 border-t border-[#181818]">
-            {/* Material Filter Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-              <span className="text-[10px] font-mono uppercase text-gray-400 flex-shrink-0">Material:</span>
-              {materialFilters.map((mat) => {
-                const isSelected = selectedMaterial === mat.value;
-                return (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+          {/* Desktop Filters Sidebar (3 Cols) */}
+          <aside className="hidden lg:block lg:col-span-3 space-y-8 sticky top-28">
+            <div className="flex items-center justify-between pb-4 border-b border-[#1C1C1C]">
+              <h2 className="text-xs font-mono uppercase tracking-widest text-[#C5A880] flex items-center space-x-2">
+                <i className="ri-sound-module-line"></i>
+                <span>Catalogue Filters</span>
+              </h2>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearAllFilters}
+                  className="text-[10px] font-mono text-gray-400 hover:text-[#C5A880] underline"
+                >
+                  Reset All
+                </button>
+              )}
+            </div>
+
+            {/* Category / System Filter */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-gray-300">
+                Door Category
+              </h3>
+              <div className="space-y-1">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => handleCategorySelect(cat)}
+                    className={`w-full text-left px-3 py-2 text-xs transition-colors flex items-center justify-between ${
+                      selectedCategory === cat
+                        ? 'bg-[#181818] text-[#C5A880] font-medium border-l-2 border-[#C5A880]'
+                        : 'text-gray-400 hover:text-white hover:bg-[#121212]'
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    {selectedCategory === cat && (
+                      <i className="ri-check-line text-xs text-[#C5A880]"></i>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Material Filter */}
+            <div className="space-y-3 pt-4 border-t border-[#1A1A1A]">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-gray-300">
+                Material Structure
+              </h3>
+              <div className="space-y-1">
+                {materialFilters.map((mat) => (
                   <button
                     key={mat.value}
                     onClick={() => handleMaterialSelect(mat.value)}
-                    className={`text-[10px] font-mono px-2.5 py-1 border transition-colors flex-shrink-0 whitespace-nowrap ${
-                      isSelected
-                        ? 'border-[#C5A880] bg-[#C5A880]/20 text-white'
-                        : 'border-[#222222] bg-[#141414] text-gray-400 hover:text-gray-200'
+                    className={`w-full text-left px-3 py-1.5 text-xs transition-colors flex items-center justify-between ${
+                      selectedMaterial === mat.value
+                        ? 'text-[#C5A880] font-medium'
+                        : 'text-gray-400 hover:text-white'
                     }`}
                   >
-                    {mat.label}
+                    <span>{mat.label}</span>
+                    {selectedMaterial === mat.value && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880]"></span>
+                    )}
                   </button>
-                );
-              })}
+                ))}
+              </div>
             </div>
 
-            {/* Search & Sort Controls */}
-            <div className="flex items-center gap-3">
-              {/* Sort Selector */}
-              <div className="flex items-center space-x-1.5 flex-shrink-0">
-                <span className="text-[10px] font-mono uppercase text-gray-400 hidden sm:inline">Sort:</span>
+            {/* Finish Filter */}
+            <div className="space-y-3 pt-4 border-t border-[#1A1A1A]">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-gray-300">
+                Curated Finish
+              </h3>
+              <div className="space-y-1">
+                {finishFilters.map((fin) => (
+                  <button
+                    key={fin.value}
+                    onClick={() => handleFinishSelect(fin.value)}
+                    className={`w-full text-left px-3 py-1.5 text-xs transition-colors flex items-center justify-between ${
+                      selectedFinish === fin.value
+                        ? 'text-[#C5A880] font-medium'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <span className="truncate">{fin.label}</span>
+                    {selectedFinish === fin.value && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880]"></span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Price Filter */}
+            <div className="space-y-3 pt-4 border-t border-[#1A1A1A]">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-gray-300">
+                Price Bracket
+              </h3>
+              <div className="space-y-1">
+                {priceRanges.map((pr) => (
+                  <button
+                    key={pr.value}
+                    onClick={() => setPriceRange(pr.value)}
+                    className={`w-full text-left px-3 py-1.5 text-xs transition-colors flex items-center justify-between ${
+                      priceRange === pr.value
+                        ? 'text-[#C5A880] font-medium'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <span>{pr.label}</span>
+                    {priceRange === pr.value && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880]"></span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          {/* Product Grid Area (9 Cols) */}
+          <main className="lg:col-span-9 space-y-6">
+            {/* Active Filter Bar & Results Count */}
+            <div className="flex flex-wrap items-center justify-between pb-4 border-b border-[#1C1C1C] gap-4">
+              <p className="text-xs font-mono text-gray-400">
+                Showing <span className="text-white font-semibold">{filteredProducts.length}</span> Architectural Doors
+              </p>
+
+              {/* Desktop Sort Dropdown */}
+              <div className="hidden lg:flex items-center space-x-3 text-xs font-mono">
+                <span className="text-gray-400">Sort By:</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-[#141414] border border-[#262626] focus:border-[#C5A880] text-[11px] font-mono text-gray-200 px-3 py-1.5 focus:outline-none"
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                  aria-label="Sort products"
+                  className="bg-[#121212] border border-[#262626] py-1.5 px-3 text-white focus:outline-none focus:border-[#C5A880]"
                 >
                   <option value="featured">Featured First</option>
                   <option value="price-asc">Price: Low to High</option>
@@ -257,202 +397,178 @@ export default function Products() {
                   <option value="name">Name (A–Z)</option>
                 </select>
               </div>
-
-              {/* Search Bar */}
-              <div className="relative w-full md:w-60">
-                <input
-                  type="text"
-                  placeholder="Search door models, finishes..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#141414] border border-[#262626] focus:border-[#C5A880] px-3 py-1.5 text-xs font-mono text-[#F3F3F1] placeholder-gray-500 focus:outline-none transition-colors"
-                />
-                {searchQuery ? (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-                  >
-                    <i className="ri-close-line text-xs"></i>
-                  </button>
-                ) : (
-                  <i className="ri-search-line absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
-                )}
-              </div>
             </div>
-          </div>
 
-          {/* Active Filter Indicators */}
-          {(selectedCategory !== 'All' || selectedMaterial !== 'All' || searchQuery) && (
-            <div className="flex items-center justify-between pt-2 text-[11px] font-mono">
-              <div className="flex items-center space-x-2 text-gray-400 flex-wrap gap-1">
-                <span>Active Filters:</span>
+            {/* Active Filter Badges */}
+            {hasActiveFilters && (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 {selectedCategory !== 'All' && (
-                  <span className="bg-[#1C1C1C] border border-[#333] px-2 py-0.5 text-[#C5A880]">
-                    {selectedCategory}
+                  <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-[#1A1A1A] border border-[#333] text-xs font-mono text-[#C5A880]">
+                    <span>Category: {selectedCategory}</span>
+                    <button onClick={() => handleCategorySelect('All')} className="hover:text-white">
+                      ×
+                    </button>
                   </span>
                 )}
                 {selectedMaterial !== 'All' && (
-                  <span className="bg-[#1C1C1C] border border-[#333] px-2 py-0.5 text-[#C5A880]">
-                    Material: {selectedMaterial}
+                  <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-[#1A1A1A] border border-[#333] text-xs font-mono text-[#C5A880]">
+                    <span>Material: {selectedMaterial}</span>
+                    <button onClick={() => handleMaterialSelect('All')} className="hover:text-white">
+                      ×
+                    </button>
+                  </span>
+                )}
+                {selectedFinish !== 'All' && (
+                  <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-[#1A1A1A] border border-[#333] text-xs font-mono text-[#C5A880]">
+                    <span>Finish: {selectedFinish}</span>
+                    <button onClick={() => handleFinishSelect('All')} className="hover:text-white">
+                      ×
+                    </button>
+                  </span>
+                )}
+                {priceRange !== 'All' && (
+                  <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-[#1A1A1A] border border-[#333] text-xs font-mono text-[#C5A880]">
+                    <span>Price Filtered</span>
+                    <button onClick={() => setPriceRange('All')} className="hover:text-white">
+                      ×
+                    </button>
                   </span>
                 )}
                 {searchQuery && (
-                  <span className="bg-[#1C1C1C] border border-[#333] px-2 py-0.5 text-gray-200">
-                    "{searchQuery}"
+                  <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-[#1A1A1A] border border-[#333] text-xs font-mono text-[#C5A880]">
+                    <span>Search: "{searchQuery}"</span>
+                    <button onClick={() => setSearchQuery('')} className="hover:text-white">
+                      ×
+                    </button>
                   </span>
                 )}
+                <button
+                  onClick={clearAllFilters}
+                  className="text-xs font-mono text-gray-400 hover:text-white underline ml-2"
+                >
+                  Clear All
+                </button>
               </div>
+            )}
 
-              <button
-                onClick={clearAllFilters}
-                className="text-[#C5A880] hover:underline uppercase text-[10px]"
-              >
-                Reset All Filters
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+            {/* Empty State */}
+            {filteredProducts.length === 0 ? (
+              <div className="p-16 text-center bg-[#111111] border border-[#1F1F1F] space-y-4 my-8">
+                <i className="ri-door-open-line text-4xl text-[#C5A880]"></i>
+                <h3 className="text-xl font-serif text-white">No Matching Architectural Doors</h3>
+                <p className="text-xs text-gray-400 max-w-md mx-auto">
+                  We could not find doors matching your specific combination of filters. Try broadening your criteria or reset filters.
+                </p>
+                <div className="pt-2">
+                  <Button onClick={clearAllFilters} variant="secondary" size="sm">
+                    Reset All Filters
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              /* Product Grid */
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 pt-2">
+                {filteredProducts.map((product, idx) => (
+                  <Reveal key={product.id} delay={idx * 40}>
+                    <div className="group relative bg-[#111111] border border-[#1F1F1F] hover:border-[#C5A880]/60 transition-all duration-500 flex flex-col h-full overflow-hidden">
+                      {/* Product Image Frame */}
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="relative aspect-[3/4] w-full bg-[#080808] overflow-hidden block"
+                      >
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        
+                        {/* Category Badge */}
+                        <div className="absolute top-3 left-3 bg-[#0A0A0A]/90 backdrop-blur-md px-2 py-0.5 border border-white/10 text-[9px] font-mono uppercase tracking-wider text-[#C5A880]">
+                          {product.category}
+                        </div>
 
-      {/* Product Display Grid Section */}
-      <div className="py-12 sm:py-16 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto">
-        {/* Count Bar */}
-        <div className="pb-6 flex justify-between items-center text-xs font-mono text-gray-400">
-          <p>
-            Showing <span className="text-[#C5A880] font-semibold">{filteredProducts.length}</span> Architectural Door System{filteredProducts.length === 1 ? '' : 's'}
-          </p>
-        </div>
-
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-24 space-y-4 bg-[#0F0F0F] border border-[#1C1C1C] p-8">
-            <i className="ri-door-line text-4xl text-gray-500"></i>
-            <h3 className="text-xl font-serif text-white">No architectural door systems match your criteria</h3>
-            <p className="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">
-              Try adjusting your category selection, removing material filters, or clearing search keywords. We also provide full bespoke architectural fabrication.
-            </p>
-            <div className="pt-3 flex justify-center gap-4">
-              <Button onClick={clearAllFilters} variant="primary" size="sm">
-                Reset Filters
-              </Button>
-              <Button to="/bespoke" variant="outline" size="sm">
-                Inquire Bespoke Build
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product, idx) => (
-              <Reveal key={product.id} delay={Math.min(idx * 40, 200)}>
-                <div className="spotlight-card group border border-[#1E1E1E] hover:border-[#C5A880]/60 flex flex-col justify-between transition-all duration-500 hover:shadow-2xl bg-[#0E0E0E] overflow-hidden h-full">
-                  {/* Product Image */}
-                  <Link
-                    to={`/product/${product.id}`}
-                    className="relative aspect-[3/4] w-full overflow-hidden bg-[#080808] block img-zoom-container"
-                  >
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      className="w-full h-full object-cover object-center"
-                      loading="lazy"
-                    />
-
-                    {/* Category & Badge */}
-                    <div className="absolute top-2.5 left-2.5 bg-black/80 backdrop-blur-md border border-white/10 px-2 py-0.5 text-[8px] sm:text-[9px] font-mono uppercase tracking-wider text-[#C5A880]">
-                      {product.category}
-                    </div>
-
-                    {product.featured && (
-                      <div className="absolute top-2.5 right-2.5 bg-[#C5A880] text-black px-2 py-0.5 text-[8px] sm:text-[9px] font-mono uppercase tracking-wider font-bold shadow-md">
-                        Masterpiece
-                      </div>
-                    )}
-
-                    {/* Hover Overlay */}
-                    <div className="hidden sm:flex absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 items-end p-4">
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-white flex items-center space-x-1.5">
-                        <span>View Technical Specs</span>
-                        <i className="ri-arrow-right-line text-[#C5A880]"></i>
-                      </span>
-                    </div>
-                  </Link>
-
-                  {/* Product Metadata & Actions */}
-                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
-                    <div className="space-y-1.5">
-                      <p className="text-[9px] sm:text-[10px] font-mono text-[#C5A880] uppercase tracking-wider truncate">
-                        {product.subCategory}
-                      </p>
-
-                      <Link to={`/product/${product.id}`} className="block">
-                        <h3 className="text-sm sm:text-base font-serif text-[#F3F3F1] group-hover:text-[#C5A880] transition-colors leading-snug line-clamp-1">
-                          {product.name}
-                        </h3>
+                        {product.featured && (
+                          <div className="absolute top-3 right-3 bg-[#C5A880] text-black px-2 py-0.5 text-[9px] font-mono font-bold uppercase">
+                            Featured
+                          </div>
+                        )}
                       </Link>
 
-                      <p className="text-[11px] text-gray-400 font-light line-clamp-1 leading-relaxed">
-                        {product.materialType || product.description}
-                      </p>
+                      {/* Product Card Metadata */}
+                      <div className="p-5 flex flex-col flex-1 justify-between space-y-4">
+                        <div className="space-y-1.5">
+                          <p className="text-[10px] font-mono uppercase tracking-widest text-[#C5A880]">
+                            {product.subCategory}
+                          </p>
+                          <Link to={`/product/${product.id}`}>
+                            <h3 className="text-base font-serif text-[#F3F3F1] group-hover:text-[#C5A880] transition-colors leading-snug line-clamp-2">
+                              {product.name}
+                            </h3>
+                          </Link>
+                          <p className="text-xs text-gray-400 font-light line-clamp-2 leading-relaxed">
+                            {product.materialType}
+                          </p>
+                        </div>
 
-                      {/* Finish Swatches Preview */}
-                      {product.finishOptions && product.finishOptions.length > 0 && (
-                        <div className="pt-1 flex items-center space-x-1.5">
-                          <span className="text-[8px] font-mono uppercase text-gray-400">Finishes:</span>
+                        {/* Starting Price & Finishes */}
+                        <div className="pt-3 border-t border-[#1C1C1C] space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-mono uppercase text-gray-400">Starting Price</span>
+                            <span className="text-sm font-mono text-[#F3F3F1] font-semibold">
+                              {formatPrice(product.price)}
+                            </span>
+                          </div>
+
+                          {/* Finishes chips */}
                           <div className="flex items-center space-x-1">
-                            {product.finishOptions.slice(0, 3).map((finish, fIdx) => (
+                            {product.finishOptions.slice(0, 2).map((finish) => (
                               <span
-                                key={fIdx}
-                                title={finish}
-                                className={`w-2 h-2 rounded-full border border-white/20 ${
-                                  fIdx === 0 ? 'bg-[#4A3B32]' : fIdx === 1 ? 'bg-[#8C6D46]' : 'bg-[#222222]'
-                                }`}
-                              />
+                                key={finish}
+                                className="px-1.5 py-0.5 bg-[#181818] border border-[#282828] text-[9px] font-mono text-gray-300 truncate max-w-[110px]"
+                              >
+                                {finish}
+                              </span>
                             ))}
-                            {product.finishOptions.length > 3 && (
-                              <span className="text-[8px] font-mono text-gray-400">
-                                +{product.finishOptions.length - 3}
+                            {product.finishOptions.length > 2 && (
+                              <span className="text-[9px] font-mono text-gray-500">
+                                +{product.finishOptions.length - 2}
                               </span>
                             )}
                           </div>
+
+                          {/* Action Buttons */}
+                          <div className="grid grid-cols-2 gap-2 pt-1">
+                            <Link
+                              to={`/product/${product.id}`}
+                              className="py-2 px-2 bg-[#171717] hover:bg-[#222222] text-white border border-[#2B2B2B] text-center text-[11px] font-mono uppercase tracking-wider transition-colors duration-300"
+                            >
+                              VIEW PRODUCT
+                            </Link>
+                            <button
+                              onClick={(e) => handleQuickAdd(e, product)}
+                              className={`py-2 px-2 text-center text-[11px] font-mono uppercase tracking-wider border transition-all duration-300 ${
+                                addedId === product.id
+                                  ? 'bg-[#C5A880] text-black border-[#C5A880] font-bold'
+                                  : 'bg-transparent text-[#C5A880] border-[#C5A880]/50 hover:bg-[#C5A880] hover:text-black'
+                              }`}
+                            >
+                              {addedId === product.id ? '✓ ADDED' : 'ADD TO BAG'}
+                            </button>
+                          </div>
                         </div>
-                      )}
-                    </div>
-
-                    {/* Pricing & Add to Bag Row */}
-                    <div className="pt-3 border-t border-[#1C1C1C] flex items-center justify-between gap-2">
-                      <div>
-                        <span className="font-serif text-sm sm:text-base text-white font-semibold">
-                          {formatPrice(product.price)}
-                        </span>
                       </div>
-
-                      <button
-                        onClick={(e) => handleQuickAdd(e, product)}
-                        className="bg-[#181818] hover:bg-[#C5A880] text-gray-200 hover:text-black border border-[#2A2A2A] hover:border-[#C5A880] px-3 py-1.5 text-[10px] font-mono uppercase transition-all duration-300 flex items-center space-x-1 flex-shrink-0 active:scale-95"
-                        title="Add to Specification Bag"
-                      >
-                        {addedId === product.id ? (
-                          <>
-                            <i className="ri-check-line text-green-400"></i>
-                            <span className="text-green-400 font-semibold">Added</span>
-                          </>
-                        ) : (
-                          <>
-                            <i className="ri-shopping-bag-line text-xs"></i>
-                            <span>Add</span>
-                          </>
-                        )}
-                      </button>
                     </div>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        )}
+                  </Reveal>
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
       </div>
 
       <Footer />
     </div>
   );
 }
-

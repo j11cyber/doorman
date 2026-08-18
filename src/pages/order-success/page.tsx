@@ -115,15 +115,19 @@ export default function OrderSuccess() {
             Order Confirmation
           </p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-white">
-            {method === 'bank' ? 'Specification Order Received' : 'Payment Confirmed'}
+            ORDER CONFIRMED
           </h1>
           <p className="text-sm text-gray-300 font-light max-w-lg mx-auto">
-            Thank you for commissioning TheDoorman. Your order has entered our architectural scheduling queue.
+            {method === 'bank'
+              ? 'Thank you for commissioning TheDoorman. Your bank wire order specification has entered our architectural queue.'
+              : 'Thank you for commissioning TheDoorman. Your payment has cleared and your order has entered our fabrication queue.'}
           </p>
           {reference && (
-            <p className="text-xs font-mono text-gray-400 pt-2">
-              Order Reference: <span className="text-[#C5A880] font-semibold">{reference}</span>
-            </p>
+            <div className="pt-3 inline-block bg-[#111] px-4 py-2 border border-[#222]">
+              <p className="text-xs font-mono text-gray-400">
+                Order Reference: <span className="text-[#C5A880] font-semibold">{reference}</span>
+              </p>
+            </div>
           )}
         </div>
 
@@ -198,11 +202,11 @@ export default function OrderSuccess() {
         </div>
 
         <div className="flex justify-center space-x-4 pt-4">
-          <Button to="/" variant="secondary" size="md">
-            Return to Showroom
-          </Button>
           <Button to="/products" variant="primary" size="md">
-            Explore More Doors
+            CONTINUE SHOPPING
+          </Button>
+          <Button to="/" variant="secondary" size="md">
+            VIEW SHOWROOM
           </Button>
         </div>
       </div>

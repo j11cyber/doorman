@@ -37,10 +37,18 @@ export default function About() {
           <p className="text-base sm:text-lg lg:text-xl text-gray-300 font-light leading-relaxed max-w-3xl">
             TheDoorman was conceived to bridge the gap between visionary architectural design and industrial door engineering. We believe the entrance is the most consequential element of any architectural structure.
           </p>
+          <div className="pt-2 flex gap-4">
+            <Button to="/products" variant="primary" size="md">
+              SHOP DOORS
+            </Button>
+            <Button to="/bespoke" variant="secondary" size="md">
+              Bespoke Atelier
+            </Button>
+          </div>
         </Reveal>
       </section>
 
-      {/* 2. Editorial Narrative Section (Image + Text Story) */}
+      {/* 2. Editorial Narrative Section */}
       <section className="py-24 sm:py-36 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto border-b border-[#1C1C1C]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           <div className="lg:col-span-6 relative">
@@ -113,7 +121,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* 4. Global Showrooms & Representation */}
+      {/* 4. Global Showroom Studios */}
       <section className="py-24 sm:py-32 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto border-t border-[#1C1C1C]">
         <SectionHeading
           eyebrow="Presence & Consultations"
@@ -161,6 +169,26 @@ export default function About() {
             </div>
           </Reveal>
         </div>
+      </section>
+
+      {/* 5. Final Exploration CTA */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12 bg-[#0C0C0C] border-t border-[#1C1C1C] text-center">
+        <Reveal delay={50} className="max-w-3xl mx-auto space-y-6">
+          <p className="text-xs font-mono uppercase tracking-widest-arch text-[#C5A880]">
+            The Digital Showroom
+          </p>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-white">
+            EXPLORE THE COLLECTION
+          </h2>
+          <p className="text-sm text-gray-300 font-light">
+            Discover our curated portfolio of engineered entrance portals, flush wall doors, and sliding glass partitions.
+          </p>
+          <div className="pt-2">
+            <Button to="/products" variant="primary" size="lg">
+              SHOP DOORS
+            </Button>
+          </div>
+        </Reveal>
       </section>
 
       <Footer />

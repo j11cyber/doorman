@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Navbar from '../../components/feature/Navbar';
 import Footer from '../../components/feature/Footer';
 import { Button } from '../../components/ui/Button';
@@ -10,17 +10,26 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import { useCart } from '../../contexts/CartContext';
 
 export default function Home() {
-  const navigate = useNavigate();
   const { formatPrice } = useCurrency();
   const { addToCart } = useCart();
   const [quickAddedId, setQuickAddedId] = useState<string | null>(null);
 
-  const heroProduct = mockProducts[0]; // Aeterna Grand Smoked Oak & Carbon Pivot Door
-  const bronzePivot = mockProducts[1]; // Venezia Patinated Liquid Bronze Pivot Portal
-  const flushDoor = mockProducts[2];   // Invisio Zero-Sightline Minimalist Flush Door
-  const slidingGlass = mockProducts[3];// Aura Fluted Glass Bronze Grid Sliding Partition
-  const armoredDoor = mockProducts[4]; // Fortis Biometric Armored Grand Entrance System
-  const walnutDoor = mockProducts[5];  // Canaletto 3D Ribbed Walnut Architectural Door
+  // 6 Real Products for Featured Collection
+  const featuredCollection = [
+    mockProducts[0], // Aeterna Grand Smoked Oak & Carbon Pivot Door
+    mockProducts[1], // Venezia Patinated Liquid Bronze Pivot Portal
+    mockProducts[2], // Invisio Zero-Sightline Minimalist Flush Door
+    mockProducts[3], // Aura Fluted Glass Bronze Grid Sliding Partition
+    mockProducts[4], // Fortis Biometric Armored Grand Entrance System
+    mockProducts[5], // Canaletto 3D Ribbed Walnut Architectural Door
+  ];
+
+  // Most Requested Statement Doors
+  const mostRequestedDoors = [
+    mockProducts[0], // Aeterna Grand Pivot
+    mockProducts[4], // Fortis Biometric Armored
+    mockProducts[1], // Venezia Liquid Bronze
+  ];
 
   const handleQuickAdd = (e: React.MouseEvent, product: typeof mockProducts[0]) => {
     e.preventDefault();
@@ -30,110 +39,107 @@ export default function Home() {
     setTimeout(() => setQuickAddedId(null), 2500);
   };
 
-  // 6 Real Categories with real representative images & descriptions
+  // 6 Real Categories
   const doorSystemCategories = [
     {
       name: 'Pivot Doors',
       sub: 'Grand Entrance & Portals',
-      description: 'Oversized monolithic pivot portals with concealed 500kg floor hydraulics.',
-      image: heroProduct.images[0],
+      description: 'Floor-concealed hydraulic pivot systems supporting panels up to 500kg with 360° hold-open actuation.',
+      image: mockProducts[0].images[0],
       link: '/products?category=Pivot%20Doors',
       count: '3 Models Available',
     },
     {
       name: 'Concealed & Flush Doors',
       sub: 'Zero-Sightline Wall Integration',
-      description: 'Invisible subframes and magnetic latches engineered to disappear into walls.',
-      image: flushDoor.images[0],
+      description: 'Extruded aluminum sub-frames with 3D-adjustable invisible hinges that integrate completely flush with wall surfaces.',
+      image: mockProducts[2].images[0],
       link: '/products?category=Concealed%20%26%20Flush%20Doors',
       count: '1 Model Available',
     },
     {
       name: 'Sliding Glass Partitions',
       sub: 'Acoustic & Fluted Glass',
-      description: 'Ceiling-hung fluted and smoked glass dividers with ultra-slim bronze profiles.',
-      image: slidingGlass.images[0],
+      description: 'Concealed ceiling soft-close tracks with 18mm anodized bronze profiles and acoustic laminated glass.',
+      image: mockProducts[3].images[0],
       link: '/products?category=Sliding%20Glass%20Partitions',
       count: '2 Models Available',
     },
     {
       name: 'Armored Security Doors',
       sub: 'RC4 Biometric Entrances',
-      description: 'Certified ballistic manganese armor clad in natural basalt stone and thermo-teak.',
-      image: armoredDoor.images[0],
+      description: 'Ballistic manganese armor cores clad in natural stone and teak with integrated biometric scanners.',
+      image: mockProducts[4].images[0],
       link: '/products?category=Armored%20Security%20Doors',
       count: '1 Model Available',
     },
     {
       name: 'Bespoke Wood Doors',
       sub: 'Ribbed Walnut & Smoked Oak',
-      description: 'CNC 3D milled staves and book-matched European veneers for grand salons.',
-      image: walnutDoor.images[0],
+      description: 'Precision CNC-milled 3D staves and sequential book-matched European veneers for grand interior salons.',
+      image: mockProducts[5].images[0],
       link: '/products?category=Bespoke%20Wood%20Doors',
       count: '2 Models Available',
     },
     {
       name: 'Architectural Hardware',
-      sub: 'Solid Cast Bronze Pulls',
-      description: 'Sculptural 2200mm silicon bronze door pulls and biometric smart grips.',
-      image: mockProducts[7].images[0],
+      sub: 'Solid Cast Silicon Bronze',
+      description: '2200mm full-height sculptural door pulls cast in pure silicon bronze with hand-rubbed wax patinas.',
+      image: mockProducts[8].images[0],
       link: '/products?category=Architectural%20Hardware',
       count: '1 Model Available',
     },
   ];
 
-  // Tactile Material Showcase matching real product finishes
-  const architecturalMaterials = [
+  // Real Finishes from mockProducts
+  const architecturalFinishes = [
     {
       name: 'Smoked European Oak',
       category: 'Pivot & Wood Doors',
       description: 'Slow-fumed European white oak with deep charcoal patina and prominent open grain.',
       image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
-      categoryLink: '/products?category=Pivot%20Doors',
-      featuredProduct: heroProduct,
+      link: '/products?finish=Smoked%20Bog%20Oak',
+      sampleProduct: mockProducts[0],
     },
     {
       name: 'Patinated Liquid Bronze',
       category: 'Artisan Metal Pivots',
       description: 'Hand-applied real bronze alloy chemically patinated into an unrepeatable monolithic skin.',
       image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80',
-      categoryLink: '/products?category=Pivot%20Doors',
-      featuredProduct: bronzePivot,
+      link: '/products?finish=Oxidized%20Dark%20Bronze',
+      sampleProduct: mockProducts[1],
     },
     {
       name: 'Fluted Acoustic Glass',
       category: 'Sliding Partitions',
       description: 'Precision vertical reeded tempered glass with acoustic interlayers and bronze trim.',
       image: 'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?auto=format&fit=crop&w=800&q=80',
-      categoryLink: '/products?category=Sliding%20Glass%20Partitions',
-      featuredProduct: slidingGlass,
+      link: '/products?finish=Brushed%20Bronze',
+      sampleProduct: mockProducts[3],
     },
     {
       name: '3D Ribbed Canaletto Walnut',
       category: 'Bespoke Interior Doors',
       description: 'Precision CNC-fluted solid Italian walnut creating rich architectural shadow play.',
       image: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80',
-      categoryLink: '/products?category=Bespoke%20Wood%20Doors',
-      featuredProduct: walnutDoor,
-    },
-  ];
-
-  // Projects matched to actual door models in catalog
-  const projectsWithDoors = [
-    {
-      project: mockProjects[0],
-      linkedProduct: bronzePivot, // Venezia Liquid Bronze
-      role: 'Main Entrance Portal',
+      link: '/products?finish=Natural%20Canaletto%20Walnut',
+      sampleProduct: mockProducts[5],
     },
     {
-      project: mockProjects[1],
-      linkedProduct: flushDoor, // Invisio Zero-Sightline
-      role: 'Interior Flush Package',
+      name: 'Scorched Basalt & Teak',
+      category: 'Armored Security',
+      description: 'Natural volcanic basalt stone tiles combined with weather-sealed thermo-treated teak.',
+      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+      link: '/products?finish=Scorched%20Basalt%20%26%20Teak',
+      sampleProduct: mockProducts[4],
     },
     {
-      project: mockProjects[2],
-      linkedProduct: slidingGlass, // Aura Fluted Glass
-      role: 'Executive Space Partition',
+      name: 'Matte Obsidian Black',
+      category: 'Minimalist Aluminum',
+      description: 'Ultra-matte electrostatic powder coat with velvety tactile surface and zero reflection.',
+      image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80',
+      link: '/products?finish=Matte%20Architectural%20Black',
+      sampleProduct: mockProducts[9],
     },
   ];
 
@@ -141,359 +147,223 @@ export default function Home() {
     <div className="min-h-screen bg-[#0A0A0A] text-[#F3F3F1] selection:bg-[#C5A880]/30 selection:text-white">
       <Navbar />
 
-      {/* 1. Cinematic Architectural Hero Section with Commerce Positioning */}
-      <section className="relative min-h-[92vh] sm:min-h-screen pt-36 sm:pt-44 lg:pt-48 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-12 xl:px-16 overflow-hidden flex flex-col justify-between">
-        {/* Background Architectural Image */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
+      {/* ========================================================================= */}
+      {/* 1. HERO SECTION — ARCHITECTURAL COMMERCE ENTRY */}
+      {/* ========================================================================= */}
+      <section className="relative min-h-[90vh] lg:min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16">
+        {/* Cinematic Architectural Background Image */}
+        <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=90"
-            alt="TheDoorman Grand Architectural Pivot Door"
-            className="w-full h-full object-cover object-center animate-hero-scale"
+            alt="TheDoorman Luxury Grand Entrance Pivot"
+            className="w-full h-full object-cover object-center scale-105 animate-subtle-zoom opacity-40"
           />
-          {/* Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/65 to-black/40" />
-          <div className="absolute inset-0 bg-radial-at-c from-transparent via-black/25 to-black/75" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/60 to-black/80" />
+          <div className="absolute inset-0 bg-radial-vignette opacity-70" />
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto">
-          <div className="max-w-3xl space-y-6 sm:space-y-8">
-            {/* Eyebrow */}
-            <div className="inline-flex items-center space-x-3 bg-black/50 backdrop-blur-md px-3.5 py-1.5 border border-[#C5A880]/30 animate-fade-in-up [animation-delay:150ms]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880] animate-pulse" />
-              <span className="text-[11px] uppercase font-mono tracking-widest-arch text-[#C5A880]">
-                Digital Showroom & Atelier
-              </span>
-            </div>
-
-            {/* Main Commerce Headline */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-serif font-light tracking-tight leading-[1.02] text-[#F3F3F1] animate-fade-in-up [animation-delay:300ms]">
-              Architectural doors, <br />
-              <span className="italic font-normal text-[#C5A880]">precisely engineered.</span>
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-sm sm:text-base lg:text-lg text-gray-300 font-light leading-relaxed max-w-xl animate-fade-in-up [animation-delay:450ms]">
-              Browse, specify, customize, and order monumental entrance pivot doors, zero-sightline concealed flush systems, and acoustic glass partitions.
-            </p>
-
-            {/* Action Buttons */}
-            <div className="pt-2 flex flex-wrap gap-4 sm:gap-6 items-center animate-fade-in-up [animation-delay:600ms]">
-              <Button to="/products" variant="primary" size="lg" icon={<i className="ri-arrow-right-line"></i>}>
-                Shop The Catalogue
-              </Button>
-              <Button to="/bespoke" variant="outline" size="lg">
-                Bespoke Commissions
-              </Button>
-            </div>
-          </div>
-
-          {/* Technical Specs Elevation Bar */}
-          <div className="mt-16 sm:mt-24 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6 text-xs text-gray-400 font-mono animate-fade-in-up [animation-delay:750ms]">
-            <div>
-              <p className="text-[#C5A880] text-sm font-semibold">4.5M</p>
-              <p className="tracking-wider uppercase text-[10px] text-gray-400 mt-0.5">Max Engineered Height</p>
-            </div>
-            <div>
-              <p className="text-[#C5A880] text-sm font-semibold">500KG</p>
-              <p className="tracking-wider uppercase text-[10px] text-gray-400 mt-0.5">Concealed Pivot Bearing</p>
-            </div>
-            <div>
-              <p className="text-[#C5A880] text-sm font-semibold">RC4 / 44dB</p>
-              <p className="tracking-wider uppercase text-[10px] text-gray-400 mt-0.5">Ballistic Security & Sound</p>
-            </div>
-            <div>
-              <p className="text-[#C5A880] text-sm font-semibold">100%</p>
-              <p className="tracking-wider uppercase text-[10px] text-gray-400 mt-0.5">Bespoke Architectural Build</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. SHOP BY DOOR SYSTEM (Immediate Category Discovery) */}
-      <section className="py-24 sm:py-32 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto border-t border-[#1C1C1C]">
-        <SectionHeading
-          eyebrow="Door Systems Discovery"
-          title="Shop by Door System"
-          subtitle="Explore engineered architectural door lines designed for grand entrances, seamless interior walls, and space divisions."
-          align="split"
-          splitContent={
-            <Button to="/products" variant="underline">
-              View Complete Catalogue ({mockProducts.length} Models)
-            </Button>
-          }
-        />
-
-        <div className="mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {doorSystemCategories.map((cat, idx) => (
-            <Reveal key={cat.name} delay={idx * 70}>
-              <Link
-                to={cat.link}
-                className="group relative block bg-[#111111] border border-[#1E1E1E] hover:border-[#C5A880]/60 transition-all duration-500 overflow-hidden shadow-xl"
-              >
-                {/* Category Image with Tactile Zoom */}
-                <div className="relative aspect-[16/11] overflow-hidden bg-[#080808] img-zoom-container">
-                  <img
-                    src={cat.image}
-                    alt={cat.name}
-                    className="w-full h-full object-cover object-center"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                  
-                  {/* Category Pill Badge */}
-                  <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md border border-white/10 px-2.5 py-1 text-[9px] font-mono uppercase tracking-widest text-[#C5A880]">
-                    0{idx + 1} // System
-                  </div>
-
-                  <div className="absolute bottom-3 right-3 text-[10px] font-mono text-gray-400 bg-black/75 px-2 py-0.5 border border-white/10">
-                    {cat.count}
-                  </div>
-                </div>
-
-                {/* Info */}
-                <div className="p-6 space-y-2">
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-[#C5A880]">
-                    {cat.sub}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full text-center sm:text-left pt-12 sm:pt-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-8 space-y-6 sm:space-y-8">
+              <Reveal delay={50}>
+                <div className="inline-flex items-center space-x-2 px-3 py-1 bg-[#1A1A1A]/80 border border-[#C5A880]/30 backdrop-blur-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880] animate-pulse"></span>
+                  <p className="text-[11px] font-mono uppercase tracking-widest-arch text-[#C5A880]">
+                    Architectural Door Systems & Atelier
                   </p>
-                  <h3 className="text-xl sm:text-2xl font-serif text-white group-hover:text-[#C5A880] transition-colors">
-                    {cat.name}
-                  </h3>
-                  <p className="text-xs text-gray-400 font-light leading-relaxed line-clamp-2">
-                    {cat.description}
-                  </p>
-                  <div className="pt-3 flex items-center text-xs font-mono text-[#C5A880] uppercase tracking-wider group-hover:translate-x-1 transition-transform">
-                    <span>Shop System</span>
-                    <i className="ri-arrow-right-line ml-2"></i>
-                  </div>
                 </div>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-      </section>
+              </Reveal>
 
-      {/* 3. FEATURED PRODUCTS (Masterpiece Showcase with Quick Add & Editorial Layout) */}
-      <section className="py-24 sm:py-32 bg-[#0C0C0C] border-y border-[#1C1C1C]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-          <SectionHeading
-            eyebrow="Architectural Masterpieces"
-            title="Featured Products"
-            subtitle="Selected flagship door systems available for specification and custom ordering."
-            align="split"
-            splitContent={
-              <Button to="/products" variant="primary">
-                Browse All Doors
-              </Button>
-            }
-          />
-
-          {/* Asymmetric Product Grid */}
-          <div className="mt-12 sm:mt-16 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            {/* Left Dominant Hero Card (7 Cols) */}
-            <div className="lg:col-span-7">
               <Reveal delay={100}>
-                <div className="spotlight-card group relative bg-[#0E0E0E] border border-[#222222] hover:border-[#C5A880]/60 transition-all duration-500 overflow-hidden shadow-2xl">
-                  <Link to={`/product/${heroProduct.id}`} className="relative aspect-[4/5] sm:aspect-[16/14] w-full block overflow-hidden bg-[#080808] img-zoom-container">
-                    <img
-                      src={heroProduct.images[0]}
-                      alt={heroProduct.name}
-                      className="w-full h-full object-cover object-center"
-                      loading="lazy"
-                    />
-                    <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-md px-3 py-1 text-[9px] font-mono uppercase tracking-widest text-[#C5A880] border border-[#C5A880]/30 shadow-md">
-                      Flagship Pivot Model
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex items-end p-6">
-                      <span className="text-xs font-mono uppercase tracking-widest text-white flex items-center space-x-2">
-                        <span>Inspect Full Blueprint & Finishes</span>
-                        <i className="ri-arrow-right-line text-[#C5A880]"></i>
-                      </span>
-                    </div>
-                  </Link>
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-serif font-light leading-[1.03] text-[#F3F3F1] tracking-tight">
+                  Doors, Engineered <br />
+                  <span className="italic font-normal text-[#C5A880]">for Architecture.</span>
+                </h1>
+              </Reveal>
 
-                  <div className="p-6 sm:p-8 space-y-4">
-                    <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="text-[#C5A880] uppercase tracking-widest">{heroProduct.category}</span>
-                      <span className="text-white font-serif font-semibold text-lg sm:text-xl">{formatPrice(heroProduct.price)}</span>
-                    </div>
+              <Reveal delay={150}>
+                <p className="text-base sm:text-lg lg:text-xl text-gray-300 font-light max-w-2xl leading-relaxed">
+                  Premium architectural door systems, refined finishes and bespoke configurations for exceptional spaces.
+                </p>
+              </Reveal>
 
-                    <Link to={`/product/${heroProduct.id}`} className="block">
-                      <h3 className="text-xl sm:text-2xl lg:text-3xl font-serif text-[#F3F3F1] group-hover:text-[#C5A880] transition-colors leading-tight">
-                        {heroProduct.name}
-                      </h3>
-                    </Link>
-
-                    <p className="text-xs sm:text-sm text-gray-400 font-light leading-relaxed line-clamp-2">
-                      {heroProduct.description}
-                    </p>
-
-                    {/* Finish Options Preview */}
-                    {heroProduct.finishOptions && (
-                      <div className="pt-2 flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-mono uppercase text-gray-400">Available Finishes:</span>
-                        {heroProduct.finishOptions.map((f, i) => (
-                          <span key={i} className="text-[10px] font-mono px-2 py-0.5 bg-[#161616] border border-[#2A2A2A] text-gray-300">
-                            {f}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Action Row */}
-                    <div className="pt-4 border-t border-[#1C1C1C] flex flex-wrap items-center justify-between gap-4">
-                      <Link
-                        to={`/product/${heroProduct.id}`}
-                        className="text-xs font-mono text-[#C5A880] hover:text-white uppercase tracking-wider flex items-center space-x-1.5 transition-colors"
-                      >
-                        <span>View Product Details</span>
-                        <i className="ri-arrow-right-line"></i>
-                      </Link>
-
-                      <button
-                        onClick={(e) => handleQuickAdd(e, heroProduct)}
-                        className="bg-[#C5A880] hover:bg-[#D8C2A2] text-black px-5 py-2.5 text-xs font-mono uppercase tracking-widest font-semibold transition-all duration-300 flex items-center space-x-2 active:scale-95"
-                      >
-                        {quickAddedId === heroProduct.id ? (
-                          <>
-                            <i className="ri-check-line"></i>
-                            <span>Added to Bag</span>
-                          </>
-                        ) : (
-                          <>
-                            <i className="ri-shopping-bag-line"></i>
-                            <span>Add to Bag</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
+              {/* Dominant Primary Shopping CTA & Secondary Bespoke CTA */}
+              <Reveal delay={200}>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                  <Button to="/products" variant="primary" size="lg" className="shadow-2xl shadow-[#C5A880]/10">
+                    <span className="flex items-center justify-center space-x-2">
+                      <span>SHOP DOORS</span>
+                      <i className="ri-arrow-right-line text-sm"></i>
+                    </span>
+                  </Button>
+                  <Button to="/bespoke" variant="secondary" size="lg">
+                    <span>EXPLORE BESPOKE</span>
+                  </Button>
                 </div>
               </Reveal>
             </div>
 
-            {/* Right Staggered Supporting Products (5 Cols) */}
-            <div className="lg:col-span-5 space-y-6">
-              {[bronzePivot, flushDoor, slidingGlass].map((product, idx) => (
-                <Reveal key={product.id} delay={150 + idx * 90}>
-                  <div className="group bg-[#0E0E0E] border border-[#222222] hover:border-[#C5A880]/50 transition-all duration-500 overflow-hidden flex flex-col sm:flex-row lg:flex-col shadow-lg">
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="relative aspect-[4/3] sm:aspect-square lg:aspect-[16/10] sm:w-1/2 lg:w-full overflow-hidden bg-[#080808] flex-shrink-0 img-zoom-container block"
-                    >
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover object-center"
-                        loading="lazy"
-                      />
-                      <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-sm px-2.5 py-0.5 text-[9px] font-mono uppercase tracking-widest text-[#C5A880] border border-white/10">
-                        {product.category}
-                      </div>
-                    </Link>
-
-                    <div className="p-5 space-y-2.5 flex-1 flex flex-col justify-between">
-                      <div>
-                        <div className="flex justify-between items-center text-xs font-mono mb-1">
-                          <span className="text-[#C5A880] uppercase tracking-widest truncate pr-2">{product.subCategory}</span>
-                          <span className="text-white font-serif font-semibold text-base">{formatPrice(product.price)}</span>
-                        </div>
-                        <Link to={`/product/${product.id}`}>
-                          <h4 className="text-base font-serif text-[#F3F3F1] group-hover:text-[#C5A880] transition-colors leading-snug line-clamp-1">
-                            {product.name}
-                          </h4>
-                        </Link>
-                        <p className="text-xs text-gray-400 font-light line-clamp-1 leading-relaxed mt-1">
-                          {product.materialType}
-                        </p>
-                      </div>
-
-                      <div className="pt-3 border-t border-[#1C1C1C] flex items-center justify-between gap-2">
-                        <Link
-                          to={`/product/${product.id}`}
-                          className="text-[11px] font-mono text-gray-400 hover:text-white uppercase tracking-wider"
-                        >
-                          View Specs
-                        </Link>
-
-                        <button
-                          onClick={(e) => handleQuickAdd(e, product)}
-                          className="bg-[#181818] hover:bg-[#C5A880] text-gray-200 hover:text-black border border-[#2A2A2A] hover:border-[#C5A880] px-3 py-1.5 text-[10px] font-mono uppercase transition-all duration-300 flex items-center space-x-1.5 active:scale-95"
-                        >
-                          {quickAddedId === product.id ? (
-                            <>
-                              <i className="ri-check-line text-green-400"></i>
-                              <span className="text-green-400 font-semibold">Added</span>
-                            </>
-                          ) : (
-                            <>
-                              <i className="ri-shopping-bag-line text-xs"></i>
-                              <span>Add to Bag</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
+            {/* Quick Hero Floating Product Preview */}
+            <div className="hidden lg:block lg:col-span-4">
+              <Reveal delay={250}>
+                <div className="p-5 bg-[#121212]/90 border border-[#262626] backdrop-blur-xl shadow-2xl space-y-4 group hover:border-[#C5A880]/50 transition-all duration-500">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-[#0A0A0A]">
+                    <img
+                      src={mockProducts[0].images[0]}
+                      alt={mockProducts[0].name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute top-3 left-3 bg-[#0A0A0A]/90 backdrop-blur-md px-2.5 py-1 border border-white/10 text-[9px] font-mono uppercase text-[#C5A880]">
+                      Featured Entrance
                     </div>
                   </div>
-                </Reveal>
-              ))}
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-gray-400">
+                      {mockProducts[0].subCategory}
+                    </p>
+                    <h3 className="text-base font-serif text-white group-hover:text-[#C5A880] transition-colors">
+                      {mockProducts[0].name}
+                    </h3>
+                    <p className="text-sm font-mono text-[#C5A880] font-semibold pt-1">
+                      From {formatPrice(mockProducts[0].price)}
+                    </p>
+                  </div>
+                  <div className="pt-2 flex items-center justify-between border-t border-[#222]">
+                    <Link
+                      to={`/product/${mockProducts[0].id}`}
+                      className="text-xs font-mono text-gray-300 hover:text-white flex items-center space-x-1"
+                    >
+                      <span>Configure Spec</span>
+                      <i className="ri-arrow-right-s-line"></i>
+                    </Link>
+                    <button
+                      onClick={(e) => handleQuickAdd(e, mockProducts[0])}
+                      className="text-xs font-mono text-[#C5A880] hover:underline"
+                    >
+                      {quickAddedId === mockProducts[0].id ? '✓ In Bag' : '+ Add to Bag'}
+                    </button>
+                  </div>
+                </div>
+              </Reveal>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. SHOP BY MATERIAL & FINISH (Tactile Architectural Materiality) */}
-      <section className="py-24 sm:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-        <SectionHeading
-          eyebrow="Materiality & Tactility"
-          title="Shop by Material & Finish"
-          subtitle="Explore door systems by tactile materiality — rare bog oaks, liquid bronze patinas, acoustic reeded glass, and solid ribbed walnuts."
-          align="center"
-        />
+      {/* ========================================================================= */}
+      {/* 2. FEATURED COLLECTION — SHOP THE COLLECTION (4–6 Real Products) */}
+      {/* ========================================================================= */}
+      <section className="py-24 sm:py-32 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto border-t border-[#1C1C1C]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+          <SectionHeading
+            eyebrow="Commercial Catalogue"
+            title="SHOP THE COLLECTION"
+            subtitle="Explore engineered pivot entrances, invisible flush frames, acoustic glass partitions, and armored security portals ready to specify and order."
+            align="left"
+          />
+          <Link
+            to="/products"
+            className="text-xs font-mono uppercase tracking-widest-arch text-[#C5A880] hover:text-white transition-colors flex items-center space-x-1.5 flex-shrink-0"
+          >
+            <span>View All Doors ({mockProducts.length})</span>
+            <i className="ri-arrow-right-line"></i>
+          </Link>
+        </div>
 
-        <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {architecturalMaterials.map((mat, index) => (
-            <Reveal key={mat.name} delay={index * 80}>
-              <div className="spotlight-card group relative border border-[#1E1E1E] overflow-hidden p-6 space-y-4 hover:border-[#C5A880]/60 transition-all duration-500 hover:shadow-xl bg-[#0E0E0E]">
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#080808] border border-[#1A1A1A] img-zoom-container">
+        {/* 6 Product Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+          {featuredCollection.map((product, idx) => (
+            <Reveal key={product.id} delay={idx * 60}>
+              <div className="group relative bg-[#111111] border border-[#1F1F1F] hover:border-[#C5A880]/60 transition-all duration-500 flex flex-col h-full overflow-hidden">
+                {/* Product Image Frame */}
+                <Link
+                  to={`/product/${product.id}`}
+                  className="relative aspect-[3/4] w-full bg-[#080808] overflow-hidden block"
+                >
                   <img
-                    src={mat.image}
-                    alt={mat.name}
-                    className="w-full h-full object-cover object-center"
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     loading="lazy"
                   />
-                  <div className="absolute top-2 right-2 bg-black/85 backdrop-blur-sm font-mono text-[9px] px-2 py-0.5 text-[#C5A880] border border-white/10">
-                    0{index + 1}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  {/* Category Pill */}
+                  <div className="absolute top-3 left-3 bg-[#0A0A0A]/90 backdrop-blur-md px-2.5 py-1 border border-white/10 text-[9px] font-mono uppercase tracking-wider text-[#C5A880]">
+                    {product.category}
                   </div>
-                </div>
 
-                <div className="space-y-1.5">
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-[#C5A880]">
-                    {mat.category}
-                  </p>
-                  <h4 className="text-base sm:text-lg font-serif text-[#F3F3F1] group-hover:text-[#C5A880] transition-colors duration-300">
-                    {mat.name}
-                  </h4>
-                  <p className="text-xs text-gray-400 font-light leading-relaxed">
-                    {mat.description}
-                  </p>
-                </div>
+                  {/* CAD Available Badge */}
+                  {product.cadAvailable && (
+                    <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-2 py-0.5 border border-white/10 text-[9px] font-mono text-gray-300">
+                      BIM / CAD
+                    </div>
+                  )}
+                </Link>
 
-                <div className="pt-3 border-t border-[#1C1C1C] flex justify-between items-center">
-                  <Link
-                    to={mat.categoryLink}
-                    className="text-xs font-mono uppercase tracking-wider text-[#C5A880] hover:text-white flex items-center space-x-1"
-                  >
-                    <span>Browse Material</span>
-                    <i className="ri-arrow-right-line text-xs"></i>
-                  </Link>
-                  <Link
-                    to={`/product/${mat.featuredProduct.id}`}
-                    className="text-[10px] font-mono text-gray-400 hover:text-gray-200"
-                    title="View Flagship Door"
-                  >
-                    View Model
-                  </Link>
+                {/* Product Metadata & Actions */}
+                <div className="p-6 flex flex-col flex-1 justify-between space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-[#C5A880]">
+                      {product.subCategory}
+                    </p>
+                    <Link to={`/product/${product.id}`}>
+                      <h3 className="text-lg font-serif text-[#F3F3F1] group-hover:text-[#C5A880] transition-colors leading-snug line-clamp-2">
+                        {product.name}
+                      </h3>
+                    </Link>
+                    <p className="text-xs text-gray-400 font-light line-clamp-2 leading-relaxed">
+                      {product.materialType}
+                    </p>
+                  </div>
+
+                  {/* Starting Price & Finishes Overview */}
+                  <div className="pt-3 border-t border-[#1C1C1C] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono uppercase text-gray-400">Starting Price</span>
+                      <span className="text-sm font-mono text-[#F3F3F1] font-semibold">
+                        {formatPrice(product.price)}
+                      </span>
+                    </div>
+
+                    {/* Finishes Swatch Dots */}
+                    <div className="flex items-center space-x-1.5">
+                      <span className="text-[9px] font-mono text-gray-500 uppercase mr-1">Finishes:</span>
+                      {product.finishOptions.slice(0, 3).map((finish) => (
+                        <span
+                          key={finish}
+                          className="px-1.5 py-0.5 bg-[#181818] border border-[#282828] text-[9px] font-mono text-gray-300"
+                        >
+                          {finish.split(' ')[0]}
+                        </span>
+                      ))}
+                      {product.finishOptions.length > 3 && (
+                        <span className="text-[9px] font-mono text-gray-500">
+                          +{product.finishOptions.length - 3}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Action Buttons: VIEW PRODUCT & ADD TO BAG */}
+                    <div className="grid grid-cols-2 gap-2 pt-2">
+                      <Link
+                        to={`/product/${product.id}`}
+                        className="py-2.5 px-3 bg-[#171717] hover:bg-[#222222] text-white border border-[#2B2B2B] text-center text-xs font-mono uppercase tracking-wider transition-colors duration-300"
+                      >
+                        VIEW PRODUCT
+                      </Link>
+                      <button
+                        onClick={(e) => handleQuickAdd(e, product)}
+                        className={`py-2.5 px-3 text-center text-xs font-mono uppercase tracking-wider border transition-all duration-300 ${
+                          quickAddedId === product.id
+                            ? 'bg-[#C5A880] text-black border-[#C5A880] font-bold'
+                            : 'bg-transparent text-[#C5A880] border-[#C5A880]/50 hover:bg-[#C5A880] hover:text-black'
+                        }`}
+                      >
+                        {quickAddedId === product.id ? '✓ ADDED' : 'ADD TO BAG'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </Reveal>
@@ -501,86 +371,207 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. DOORS IN ARCHITECTURE (Projects as Social Proof + Direct "Shop This Door" Cross-Link) */}
-      <section className="py-24 sm:py-32 bg-[#090909] border-t border-[#1C1C1C]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+      {/* ========================================================================= */}
+      {/* 3. SHOP BY SYSTEM — ARCHITECTURAL CATEGORIES */}
+      {/* ========================================================================= */}
+      <section className="py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#0D0D0D] border-t border-[#1C1C1C]">
+        <div className="max-w-7xl mx-auto">
           <SectionHeading
-            eyebrow="Architectural Case Studies"
-            title="Doors in Space"
-            subtitle="See TheDoorman installations across prominent private villas and commercial landmarks, and shop the exact systems specified."
-            align="split"
-            splitContent={
-              <Button to="/projects" variant="underline">
-                View All Case Studies
-              </Button>
-            }
+            eyebrow="Door Typologies"
+            title="SHOP BY SYSTEM"
+            subtitle="Every architectural opening demands an intentional kinematic system. Select your structural mechanism below."
+            align="center"
           />
 
-          <div className="mt-12 sm:mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {projectsWithDoors.map(({ project, linkedProduct, role }, idx) => (
-              <Reveal key={project.id} delay={idx * 100}>
-                <div className="bg-[#111111] border border-[#222222] hover:border-[#C5A880]/50 transition-all duration-500 overflow-hidden flex flex-col justify-between h-full shadow-2xl">
-                  <div>
-                    {/* Project Hero Image */}
-                    <div className="relative aspect-[16/10] overflow-hidden bg-[#080808] img-zoom-container">
-                      <img
-                        src={project.heroImage}
-                        alt={project.title}
-                        className="w-full h-full object-cover object-center"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                      <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 text-[9px] font-mono uppercase tracking-widest text-[#C5A880] border border-white/10">
-                        {project.location} • {project.year}
-                      </div>
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {doorSystemCategories.map((sys, idx) => (
+              <Reveal key={sys.name} delay={idx * 60}>
+                <Link
+                  to={sys.link}
+                  className="group relative h-[380px] sm:h-[420px] bg-[#121212] border border-[#222] hover:border-[#C5A880] transition-all duration-500 overflow-hidden flex flex-col justify-end p-6 sm:p-8 block"
+                >
+                  {/* System Image Background */}
+                  <img
+                    src={sys.image}
+                    alt={sys.name}
+                    className="absolute inset-0 w-full h-full object-cover opacity-35 group-hover:opacity-55 group-hover:scale-105 transition-all duration-700 ease-out"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+
+                  {/* Content Overlay */}
+                  <div className="relative z-10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A880]">
+                        {sys.sub}
+                      </span>
+                      <span className="text-[10px] font-mono text-gray-400">
+                        {sys.count}
+                      </span>
                     </div>
 
-                    {/* Project Details */}
-                    <div className="p-6 space-y-3">
-                      <h4 className="text-xl font-serif text-white">
-                        {project.title}
-                      </h4>
-                      <p className="text-xs text-gray-400 font-light leading-relaxed line-clamp-2">
-                        {project.description}
-                      </p>
+                    <h3 className="text-2xl font-serif text-white group-hover:text-[#C5A880] transition-colors">
+                      {sys.name}
+                    </h3>
+
+                    <p className="text-xs text-gray-300 font-light line-clamp-2 leading-relaxed">
+                      {sys.description}
+                    </p>
+
+                    <div className="pt-2 flex items-center space-x-2 text-xs font-mono text-[#C5A880] group-hover:translate-x-1 transition-transform duration-300">
+                      <span>Explore System</span>
+                      <i className="ri-arrow-right-line"></i>
                     </div>
                   </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                  {/* "DOORS FEATURED IN THIS PROJECT" Mini Commerce Card */}
-                  <div className="p-5 bg-[#0C0C0C] border-t border-[#1C1C1C] space-y-3">
-                    <p className="text-[9px] font-mono uppercase tracking-widest text-[#C5A880]">
-                      Installed Door System
+      {/* ========================================================================= */}
+      {/* 4. SHOP BY FINISH — TACTILE ARCHITECTURAL MATERIALS */}
+      {/* ========================================================================= */}
+      <section className="py-24 sm:py-32 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto border-t border-[#1C1C1C]">
+        <SectionHeading
+          eyebrow="Materiality & Patinas"
+          title="SHOP BY FINISH"
+          subtitle="Explore authentic artisan timbers, hand-patinated liquid metals, acoustic fluted glasses, and scorched volcanic basalt."
+          align="left"
+        />
+
+        <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {architecturalFinishes.map((finish, idx) => (
+            <Reveal key={finish.name} delay={idx * 60}>
+              <Link
+                to={finish.link}
+                className="group p-6 bg-[#111111] border border-[#202020] hover:border-[#C5A880]/60 transition-all duration-400 flex flex-col justify-between space-y-4 block"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden bg-[#0A0A0A] border border-white/10">
+                  <img
+                    src={finish.image}
+                    alt={finish.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md px-2 py-0.5 text-[9px] font-mono uppercase text-[#C5A880]">
+                    {finish.category}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="text-base font-serif text-white group-hover:text-[#C5A880] transition-colors">
+                    {finish.name}
+                  </h3>
+                  <p className="text-xs text-gray-400 font-light leading-relaxed">
+                    {finish.description}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-[#1E1E1E] flex items-center justify-between text-xs font-mono">
+                  <span className="text-gray-400">View Compatible Doors</span>
+                  <span className="text-[#C5A880] group-hover:translate-x-1 transition-transform">
+                    →
+                  </span>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 5. MOST REQUESTED / FEATURED STATEMENT DOORS */}
+      {/* ========================================================================= */}
+      <section className="py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#0C0C0C] border-t border-[#1C1C1C]">
+        <div className="max-w-7xl mx-auto space-y-16">
+          <SectionHeading
+            eyebrow="Architectural Flagships"
+            title="FEATURED STATEMENT DOORS"
+            subtitle="The most frequently specified monumental portals engineered for private villas and corporate headquarters."
+            align="center"
+          />
+
+          <div className="space-y-12">
+            {mostRequestedDoors.map((product, idx) => (
+              <Reveal key={product.id} delay={idx * 80}>
+                <div className="p-6 sm:p-10 bg-[#121212] border border-[#222] hover:border-[#C5A880]/50 transition-all duration-500 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                  {/* Left Product Hero Shot */}
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="lg:col-span-6 relative aspect-[4/5] sm:aspect-[16/11] bg-[#0A0A0A] overflow-hidden border border-white/10 group block"
+                  >
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-md px-3 py-1 border border-white/15 text-[10px] font-mono uppercase text-[#C5A880]">
+                      {product.subCategory}
+                    </div>
+                  </Link>
+
+                  {/* Right Technical Commerce Specs */}
+                  <div className="lg:col-span-6 space-y-5">
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-mono uppercase tracking-widest-arch text-[#C5A880]">
+                        {product.category}
+                      </p>
+                      <Link to={`/product/${product.id}`}>
+                        <h3 className="text-2xl sm:text-3xl font-serif text-white hover:text-[#C5A880] transition-colors leading-tight">
+                          {product.name}
+                        </h3>
+                      </Link>
+                    </div>
+
+                    <p className="text-sm text-gray-300 font-light leading-relaxed">
+                      {product.description}
                     </p>
-                    <div className="flex items-center space-x-3.5">
-                      <img
-                        src={linkedProduct.images[0]}
-                        alt={linkedProduct.name}
-                        className="w-12 h-14 object-cover border border-[#262626] bg-[#161616] flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h5 className="text-xs font-serif text-white truncate group-hover:text-[#C5A880]">
-                          {linkedProduct.name}
-                        </h5>
-                        <p className="text-[10px] font-mono text-[#C5A880] mt-0.5">
-                          {formatPrice(linkedProduct.price)}
-                        </p>
+
+                    {/* Spec Bullets */}
+                    <div className="grid grid-cols-2 gap-4 py-3 border-y border-[#1E1E1E] text-xs font-mono">
+                      <div>
+                        <span className="text-gray-500 uppercase block text-[10px]">Max Scale</span>
+                        <span className="text-gray-200">{product.maxDimensions.split('up to ')[1] || product.maxDimensions}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 uppercase block text-[10px]">Kinematics</span>
+                        <span className="text-gray-200">{product.openingMechanism.split(' ')[0]} Hydraulic</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 uppercase block text-[10px]">Lead Time</span>
+                        <span className="text-gray-200">{product.leadTime}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 uppercase block text-[10px]">Hardware</span>
+                        <span className="text-gray-200 truncate block">{product.hardwareType.split(' ')[0]} Integrated</span>
                       </div>
                     </div>
 
-                    <div className="pt-2 flex justify-between items-center border-t border-[#181818]">
-                      <Link
-                        to={`/product/${linkedProduct.id}`}
-                        className="text-xs font-mono uppercase tracking-wider text-[#C5A880] hover:text-white flex items-center space-x-1"
-                      >
-                        <span>Shop This Door</span>
-                        <i className="ri-arrow-right-line text-xs"></i>
-                      </Link>
-                      <Link
-                        to="/projects"
-                        className="text-[10px] font-mono text-gray-400 hover:text-gray-200"
-                      >
-                        Project Details →
-                      </Link>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
+                      <div>
+                        <p className="text-[10px] font-mono uppercase text-gray-400">Starting Price</p>
+                        <p className="text-xl font-mono font-semibold text-white">
+                          {formatPrice(product.price)}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <Button to={`/product/${product.id}`} variant="secondary" size="sm">
+                          Configure Spec
+                        </Button>
+                        <button
+                          onClick={(e) => handleQuickAdd(e, product)}
+                          className={`px-5 py-2.5 text-xs font-mono uppercase tracking-wider border transition-all duration-300 ${
+                            quickAddedId === product.id
+                              ? 'bg-[#C5A880] text-black border-[#C5A880] font-bold'
+                              : 'bg-[#C5A880] text-black border-[#C5A880] hover:bg-[#d4b993]'
+                          }`}
+                        >
+                          {quickAddedId === product.id ? '✓ Added' : 'Add to Bag'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -590,126 +581,148 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. BESPOKE COMMISSIONS (Custom Dimensions & Made to Order) */}
-      <section className="py-24 sm:py-32 bg-[#0C0C0C] border-t border-[#1C1C1C] relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <Reveal delay={50} className="lg:col-span-7 space-y-6">
+      {/* ========================================================================= */}
+      {/* 6. ARCHITECTURAL PROJECTS — CONNECTING PROJECTS TO COMMERCE */}
+      {/* ========================================================================= */}
+      <section className="py-24 sm:py-32 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto border-t border-[#1C1C1C]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+          <SectionHeading
+            eyebrow="Built Architecture"
+            title="INSTALLED PROJECTS & CASE STUDIES"
+            subtitle="Explore how TheDoorman portals transform private residences and pavilions. Shop the exact doors specified in each project."
+            align="left"
+          />
+          <Link
+            to="/projects"
+            className="text-xs font-mono uppercase tracking-widest-arch text-[#C5A880] hover:text-white transition-colors flex items-center space-x-1.5 flex-shrink-0"
+          >
+            <span>View All Projects</span>
+            <i className="ri-arrow-right-line"></i>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {mockProjects.map((project, idx) => {
+            // Relate to real product model
+            const relatedDoor = idx === 0 ? mockProducts[1] : idx === 1 ? mockProducts[2] : mockProducts[3];
+
+            return (
+              <Reveal key={project.id} delay={idx * 80}>
+                <div className="bg-[#111111] border border-[#222] hover:border-[#C5A880]/50 transition-all duration-500 flex flex-col h-full">
+                  <div className="relative aspect-[4/3] bg-[#0A0A0A] overflow-hidden">
+                    <img
+                      src={project.heroImage}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                    <div className="absolute bottom-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 text-[10px] font-mono text-[#C5A880]">
+                      {project.location}
+                    </div>
+                  </div>
+
+                  <div className="p-6 flex flex-col flex-1 justify-between space-y-4">
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-mono uppercase tracking-widest text-gray-400">
+                        {project.architect}
+                      </p>
+                      <h3 className="text-lg font-serif text-white leading-snug">
+                        {project.title}
+                      </h3>
+                      <p className="text-xs text-gray-400 font-light line-clamp-2 mt-2">
+                        {project.description}
+                      </p>
+                    </div>
+
+                    {/* Commerce Bridge: Doors Used in This Project */}
+                    <div className="pt-4 border-t border-[#1C1C1C] space-y-3 bg-[#0A0A0A]/50 p-3">
+                      <p className="text-[9px] font-mono uppercase tracking-widest text-[#C5A880]">
+                        Door Used in This Project:
+                      </p>
+                      <div className="flex items-center space-x-3">
+                        <img
+                          src={relatedDoor.images[0]}
+                          alt={relatedDoor.name}
+                          className="w-10 h-12 object-cover border border-white/10 flex-shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-serif text-white truncate">
+                            {relatedDoor.name}
+                          </p>
+                          <p className="text-[10px] font-mono text-[#C5A880]">
+                            From {formatPrice(relatedDoor.price)}
+                          </p>
+                        </div>
+                      </div>
+                      <Link
+                        to={`/product/${relatedDoor.id}`}
+                        className="block w-full py-2 bg-[#1C1C1C] hover:bg-[#C5A880] hover:text-black text-[#F3F3F1] text-center text-xs font-mono uppercase tracking-wider transition-all duration-300"
+                      >
+                        SHOP THIS DOOR
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 7. BESPOKE ATELIER SECTION */}
+      {/* ========================================================================= */}
+      <section className="py-24 sm:py-32 px-4 sm:px-6 lg:px-12 bg-[#0C0C0C] border-t border-[#1C1C1C]">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <Reveal delay={50}>
             <p className="text-xs font-mono uppercase tracking-widest-arch text-[#C5A880]">
-              Custom Atelier & Engineering
+              Custom Architectural Commissions
             </p>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-light text-[#F3F3F1] leading-[1.08]">
-              Custom Dimensions. <br />
-              <span className="italic text-[#C5A880]">Uncompromised Scale.</span>
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif text-white mt-3 leading-tight">
+              YOUR DOOR. <br />
+              <span className="italic text-[#C5A880]">YOUR ARCHITECTURE.</span>
             </h2>
-            <p className="text-sm sm:text-base text-gray-300 font-light leading-relaxed max-w-xl">
-              When standard architectural openings cannot realize your intent. We engineer made-to-order pivot portals up to 4.5 meters in height with custom cold-spray bronze, CNC fluting, biometric integration, and full CAD/BIM shop drawings.
-            </p>
-            <div className="pt-3 flex flex-wrap gap-4">
-              <Button to="/contact?subject=Bespoke%20Architectural%20Commission" variant="primary" size="lg">
-                Request Bespoke Quote
-              </Button>
-              <Button to="/bespoke" variant="outline" size="lg">
-                Explore Bespoke Process
-              </Button>
-            </div>
           </Reveal>
 
-          <Reveal delay={120} className="lg:col-span-5 grid grid-cols-2 gap-4 text-xs font-mono">
-            <div className="p-6 bg-[#111111] border border-[#222]">
-              <p className="text-2xl font-serif text-[#C5A880]">4500mm</p>
-              <p className="text-gray-300 font-medium mt-1">Maximum Height</p>
-              <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">Laser-straight carbon-steel subframe eliminates warping.</p>
-            </div>
-            <div className="p-6 bg-[#111111] border border-[#222]">
-              <p className="text-2xl font-serif text-[#C5A880]">500kg</p>
-              <p className="text-gray-300 font-medium mt-1">Concealed Pivot</p>
-              <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">Subsurface floor hydraulics with fingertip actuation.</p>
-            </div>
-            <div className="p-6 bg-[#111111] border border-[#222]">
-              <p className="text-2xl font-serif text-[#C5A880]">RC4</p>
-              <p className="text-gray-300 font-medium mt-1">Armored Security</p>
-              <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">Multi-point motorized locking and ballistic core.</p>
-            </div>
-            <div className="p-6 bg-[#111111] border border-[#222]">
-              <p className="text-2xl font-serif text-[#C5A880]">100%</p>
-              <p className="text-gray-300 font-medium mt-1">CAD Provided</p>
-              <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">Complete shop drawings and axle offset calculations.</p>
+          <Reveal delay={100}>
+            <p className="text-sm sm:text-base text-gray-300 font-light max-w-2xl mx-auto leading-relaxed">
+              When standard openings cannot meet the scale of your vision. Our atelier collaborates directly with architects and estate owners to engineer oversized pivot portals up to 5 meters tall, multi-tier sliding partitions, and custom patinated bronze facades.
+            </p>
+          </Reveal>
+
+          <Reveal delay={150}>
+            <div className="pt-4 flex flex-col sm:flex-row justify-center gap-4">
+              <Button to="/bespoke" variant="primary" size="lg">
+                START A BESPOKE COMMISSION
+              </Button>
+              <Button to="/contact?subject=Bespoke+Inquiry" variant="secondary" size="lg">
+                Schedule Atelier Consultation
+              </Button>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* 7. BRAND CRAFTSMANSHIP & STRUCTURAL ENGINEERING (Supporting Everything) */}
-      <section className="py-24 sm:py-32 bg-[#080808] border-t border-[#1C1C1C]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6 relative">
-            <Reveal delay={80}>
-              <div className="relative aspect-[4/5] sm:aspect-[1/1] overflow-hidden border border-[#2A2A2A] shadow-2xl img-zoom-container bg-[#111]">
-                <img
-                  src="https://images.unsplash.com/photo-160058515526-990dced4db0d?auto=format&fit=crop&w=1400&q=85"
-                  alt="Architectural Door Hardware Detail"
-                  className="w-full h-full object-cover object-center"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 p-4 bg-black/85 backdrop-blur-md border border-[#333]">
-                  <p className="text-xs text-[#C5A880] font-mono uppercase tracking-wider">Invisio Subframe Precision</p>
-                  <p className="text-sm font-serif text-white mt-1">3D Micro-Adjustable Concealed Hinges & Magnetic Silent Latch</p>
-                </div>
-              </div>
-            </Reveal>
+      {/* ========================================================================= */}
+      {/* 8. FINAL HOMEPAGE CTA — SHOP ALL DOORS */}
+      {/* ========================================================================= */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto text-center border-t border-[#1C1C1C]">
+        <Reveal delay={50} className="space-y-6 max-w-3xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-white">
+            Find the door that belongs in your space.
+          </h2>
+          <p className="text-sm text-gray-300 font-light">
+            Browse our full catalogue of pivot portals, flush systems, sliding partitions, and security entrances with transparent pricing and CAD models.
+          </p>
+          <div className="pt-2">
+            <Button to="/products" variant="primary" size="lg">
+              SHOP ALL DOORS
+            </Button>
           </div>
-
-          <div className="lg:col-span-6 space-y-6">
-            <Reveal delay={120}>
-              <p className="text-xs uppercase font-mono tracking-widest-arch text-[#C5A880]">
-                Engineering & Craftsmanship
-              </p>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-[#F3F3F1] leading-[1.1] mt-2">
-                Engineered to defy gravity. <br />
-                <span className="italic text-[#C5A880]">Actuated in silence.</span>
-              </h2>
-              <p className="text-sm sm:text-base text-gray-300 font-light leading-relaxed mt-4">
-                Every TheDoorman door conceals high-precision structural mechanics: anti-warping carbon-steel tie rods, German-engineered hydraulic dampers, and multi-point magnetic latches.
-              </p>
-            </Reveal>
-
-            <Reveal delay={160} className="space-y-4 pt-2">
-              <div className="flex items-start space-x-4 p-4 bg-[#121212] border border-[#222] hover:border-[#C5A880]/30 transition-colors">
-                <i className="ri-compass-3-line text-[#C5A880] text-xl mt-0.5"></i>
-                <div>
-                  <h4 className="text-sm font-semibold text-white">Concealed Hydraulic 360° Pivots</h4>
-                  <p className="text-xs text-gray-400 mt-1 font-light leading-relaxed">
-                    Zero visible frame hardware. Bearings rest subsurface in floor and ceiling with adjustable soft braking.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4 p-4 bg-[#121212] border border-[#222] hover:border-[#C5A880]/30 transition-colors">
-                <i className="ri-shield-keyhole-line text-[#C5A880] text-xl mt-0.5"></i>
-                <div>
-                  <h4 className="text-sm font-semibold text-white">Integrated Biometric & Multi-Point Locks</h4>
-                  <p className="text-xs text-gray-400 mt-1 font-light leading-relaxed">
-                    Motorized magnetic bolts activate automatically upon door seating, certified up to European Security Class 4.
-                  </p>
-                </div>
-              </div>
-            </Reveal>
-
-            <Reveal delay={200} className="pt-2 flex gap-4">
-              <Button to="/products" variant="primary">
-                Explore The Catalogue
-              </Button>
-              <Button to="/about" variant="ghost">
-                Read Atelier Story
-              </Button>
-            </Reveal>
-          </div>
-        </div>
+        </Reveal>
       </section>
 
       <Footer />
     </div>
   );
 }
-
