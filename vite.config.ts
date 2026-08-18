@@ -79,5 +79,12 @@ export default defineConfig({
   server: {
     port: 3000,
     host: "0.0.0.0",
+    allowedHosts: ["thedoorman.onrender.com", ".onrender.com", "localhost"],
+  },
+  preview: {
+    port: 3000,
+    host: "0.0.0.0",
+    allowedHosts: ["thedoorman.onrender.com", ".onrender.com", "localhost"],
   },
 });
+
