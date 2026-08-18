@@ -1,9 +1,9 @@
 -- ==============================================================================
--- THE DOORMAN — INITIAL SUPABASE DATABASE SCHEMA
+-- THE DOORMAN — REVISED SECURE SUPABASE DATABASE SCHEMA
 -- Migration: 001_initial_schema.sql
 -- ==============================================================================
 
--- 1. Enable UUID Extension
+-- 1. Enable Required Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
@@ -78,7 +78,7 @@ CREATE TRIGGER set_orders_updated_at
 -- 5. ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
 
--- Enable RLS
+-- Enable RLS on both tables
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
@@ -86,8 +86,8 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 -- Customers RLS Policies
 -- ------------------------------------------------------------------------------
 
--- Allow Service Role full access (used by Supabase Edge Functions)
-CREATE POLICY "Service role has full access to customers"
+-- Service Role (Edge Functions & Admin scripts) has full access
+CREATE POLICY "Service role full access on customers"
     ON public.customers
     FOR ALL
     TO service_role
@@ -95,42 +95,69 @@ CREATE POLICY "Service role has full access to customers"
     WITH CHECK (true);
 
 -- Allow anonymous & authenticated users to insert customer records during checkout
-CREATE POLICY "Allow public customer creation"
+CREATE POLICY "Allow public customer insertion"
     ON public.customers
     FOR INSERT
     TO anon, authenticated
     WITH CHECK (true);
 
--- Restrict SELECT: Do NOT expose full customer list to the public.
--- Allow insert-returning and customer verification for authenticated users
-CREATE POLICY "Allow authenticated users to read own profile"
-    ON public.customers
-    FOR SELECT
-    TO authenticated
-    USING (auth.uid() = id);
+-- NOTE ON CUSTOMER SELECT:
+-- Direct public SELECT on customers is completely disabled.
+-- Customer PII (emails, phone numbers, addresses) cannot be queried or scraped by anonymous users.
 
 -- ------------------------------------------------------------------------------
 -- Orders RLS Policies
 -- ------------------------------------------------------------------------------
 
--- Allow Service Role full access (used by Supabase Edge Functions)
-CREATE POLICY "Service role has full access to orders"
+-- Service Role (Edge Functions & Admin scripts) has full access
+CREATE POLICY "Service role full access on orders"
     ON public.orders
     FOR ALL
     TO service_role
     USING (true)
     WITH CHECK (true);
 
--- Allow public users to insert orders at checkout (e.g. Bank Transfer)
+-- Allow public users to insert orders at checkout (e.g. Bank Transfer submission)
 CREATE POLICY "Allow public order creation"
     ON public.orders
     FOR INSERT
     TO anon, authenticated
     WITH CHECK (true);
 
--- Allow looking up orders on order-success page via exact order_number
-CREATE POLICY "Allow lookup order by order_number"
-    ON public.orders
-    FOR SELECT
-    TO anon, authenticated
-    USING (true);
+-- NOTE ON ORDERS SELECT:
+-- Direct public SELECT on the orders table is completely disabled.
+-- Malicious actors cannot run `SELECT * FROM orders` to dump order history or financials.
+
+-- ==============================================================================
+-- 6. SECURE SAFE ORDER STATUS LOOKUP FUNCTION (RPC)
+-- ==============================================================================
+-- This security definer function allows looking up a specific order by its exact
+-- order reference without opening up generic table scan permissions.
+
+CREATE OR REPLACE FUNCTION public.get_order_status(p_order_number TEXT)
+RETURNS TABLE (
+    order_number TEXT,
+    payment_status TEXT,
+    payment_method TEXT,
+    currency TEXT,
+    total NUMERIC,
+    created_at TIMESTAMPTZ
+)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+    SELECT
+        o.order_number,
+        o.payment_status,
+        o.payment_method,
+        o.currency,
+        o.total,
+        o.created_at
+    FROM public.orders o
+    WHERE o.order_number = p_order_number
+    LIMIT 1;
+$$;
+
+-- Grant execution to anon and authenticated users
+GRANT EXECUTE ON FUNCTION public.get_order_status(TEXT) TO anon, authenticated, service_role;
